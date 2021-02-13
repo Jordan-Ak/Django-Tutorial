@@ -2,3 +2,4 @@ mysite/__pycache__
 db.sqlite3
 polls/__pycache__
 polls/migrations/__pycache__
+mysite/SECRET_KEY.txt
