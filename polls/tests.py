@@ -4,7 +4,8 @@ from django.test import TestCase
 from django.utils import timezone
 from django.urls import reverse
 
-from .models import Question
+from .models import Question, Choice
+from .views import vote
 
 # Create your tests here.
 
@@ -44,6 +45,12 @@ def create_question(question_text, days):
     """
     time = timezone.now() + datetime.timedelta(days=days)
     return Question.objects.create(question_text=question_text, pub_date=time)
+
+def create_choice(question, choice_text):
+    """
+    Create a choice to use to test results page
+    """
+    return Choice.objects.create(question = question, choice_text = choice_text)
 
 class QuestionIndexViewTests(TestCase):
     def test_no_questions(self):
@@ -121,3 +128,28 @@ class QuestionDetailViewTests(TestCase):
         url = reverse('polls:detail', args=(past_question.id,))
         response = self.client.get(url)
         self.assertContains(response, past_question.question_text)
+
+class QuestionResultsViewTest(TestCase):
+   def test_result_view(self):
+        result_question =  create_question("How are you", -1)
+        a = create_choice(result_question, "I am fine.")
+        b = create_choice(result_question, "nothing much")
+        c = create_choice(result_question, "bad actually")
+        d = create_choice(result_question, "just okay.")
+
+        url = reverse('polls:results', args = (result_question.id,))
+        response = self.client.get(url)
+        self.assertContains(response, result_question.question_text)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, a.choice_text)
+        self.assertContains(response, b.choice_text)
+        self.assertContains(response, c.choice_text)
+        self.assertContains(response, d.choice_text)
+        self.assertContains(response, a.votes)
+        self.assertContains(response, b.votes)
+        self.assertContains(response, c.votes)
+        self.assertContains(response, d.votes)
+        self.assertEqual(c.votes, 0)
+        self.assertEqual(b.votes, 0)
+        self.assertEqual(a.votes, 0)
+        self.assertEqual(d.votes, 0)
