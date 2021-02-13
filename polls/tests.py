@@ -132,7 +132,7 @@ class QuestionDetailViewTests(TestCase):
 class QuestionResultsViewTest(TestCase):
    def test_result_view(self):
         result_question =  create_question("How are you", -1)
-        a = create_choice(result_question, "I am fine.")
+        a = create_choice(result_question, "I am' fine.")
         b = create_choice(result_question, "nothing much")
         c = create_choice(result_question, "bad actually")
         d = create_choice(result_question, "just okay.")
